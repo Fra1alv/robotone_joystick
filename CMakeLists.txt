@@ -14,11 +14,11 @@ find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 add_executable(robotone_joystick_node
- src/robotone_joystick_node.cpp
- src/robotone_joystick.cpp)
+  src/robotone_joystick_node.cpp
+  src/robotone_joystick.cpp)
 
- include_directories(
-  include
+  include_directories(
+    include
 )
 
 ament_target_dependencies(

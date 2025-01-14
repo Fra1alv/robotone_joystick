@@ -177,7 +177,7 @@ void RobotoneJoystick::OpenJoystick(Joystick & joystick, const std::string & joy
   dev_dir = opendir(path);
 
   // Check if the directory could be opened
-  if (dev_dir== nullptr){
+  if (dev_dir == nullptr) {
     RCLCPP_ERROR(this->get_logger(), "Couldn't open %s: %s:", path,
     std::strerror(errno));
     closedir(dev_dir);
@@ -204,18 +204,18 @@ void RobotoneJoystick::OpenJoystick(Joystick & joystick, const std::string & joy
     joystick.connected = true;
 
     RCLCPP_INFO(this->get_logger(), "Found joystick: %s (%s).", joystick.name, joyPath.c_str());
-    
+
   }
   // TODO verify if we need those data
   // Set up axis properties if the joystick is connected
   if (joystick.connected) {
     // Retrieve axis information for the connected joystick
     // Retrieve the number of supported Axes
-   if (ioctl(joystick.file, JSIOCGAXES, &joystick.num_axes) == -1) {
-        perror("JSIOCGAXES error");
-        RCLCPP_ERROR(this->get_logger(), "Failed to get the number of axes.");
-        closedir(dev_dir);
-        return;
+    if (ioctl(joystick.file, JSIOCGAXES, &joystick.num_axes) == -1) {
+      perror("JSIOCGAXES error");
+      RCLCPP_ERROR(this->get_logger(), "Failed to get the number of axes.");
+      closedir(dev_dir);
+      return;
     }
 
     RCLCPP_INFO(this->get_logger(), "Number of axes: %u", joystick.num_axes);
@@ -301,9 +301,9 @@ void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
           axis_value = 0.0;
         } else {
           // Normalize the axis value
-          double normalized_value = 2*(axis_value - min_value) /
-            (max_value - min_value)-1;
-          double scaled_value = normalized_value ;
+          double normalized_value = 2 * (axis_value - min_value) /
+            (max_value - min_value) - 1;
+          double scaled_value = normalized_value;
           axis_value = scaled_value;
         }
         joystick->axes[joystick->event.number].value = axis_value;
@@ -343,7 +343,7 @@ void RobotoneJoystick::JoystickUpdate()
   rclcpp::Time last_pub = this->now();
 
   device_notify = inotify_init1(IN_NONBLOCK);
-  
+
   if (device_notify == -1) {
     RCLCPP_ERROR(this->get_logger(), "Error initializing inotify: %s", std::strerror(errno));
     exit(EXIT_FAILURE);
@@ -380,7 +380,7 @@ void RobotoneJoystick::JoystickUpdate()
 
     if (joystick_.connected) {
       event = reinterpret_cast<struct inotify_event *>(buffer);
-     
+
       RCLCPP_ERROR_EXPRESSION(
         this->get_logger(),
         (event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) == 1,
