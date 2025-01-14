@@ -1,5 +1,3 @@
-#include <linux/input.h>
-#include <cstdio>
 #include <cstring>
 #include <fcntl.h>
 #include <unistd.h>
@@ -23,11 +21,6 @@ using namespace robotone::teleop;
  * It incorporates functionality to handle joystick initialization, read joystick input, detect
  * joystick events, apply deadzones to axis values, and publish the joystick data as Joy messages
  * to a specified topic.
- *
- * The RobotoneJoystick class is designed to be used within a ROS 2 environment, providing a robust
- * and flexible solution for teleoperation and control applications involving joysticks or similar
- * input devices. It leverages ROS 2's capabilities for parameter management, logging, and
- * asynchronous communication to facilitate seamless integration into larger robotic systems.
  *
  */
 RobotoneJoystick::RobotoneJoystick(const std::string & name)
