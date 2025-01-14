@@ -16,7 +16,7 @@ namespace teleop
 class RobotoneJoystick : public rclcpp::Node
 {
 public:
-  RobotoneJoystick(const std::string & name);
+  RobotoneJoystick(const std::string& name);
   ~RobotoneJoystick();
 
 public:
@@ -44,24 +44,18 @@ public:
     int num_axes;
     struct js_event event;
 
-    Joystick()
-      :axis_event(false),
-      buttons_event(false),
-      publish(false),
-      connected(false),
-      initialized(false),
-      file(-1)
+    Joystick() : axis_event(false), buttons_event(false), publish(false), connected(false), initialized(false), file(-1)
+    {
+      std::memset(buttons, 0, sizeof(buttons));
+      std::memset(name, 0, sizeof(name));
+
+      for (int i = 0; i < kMaxAxes; ++i)
       {
-        std::memset(buttons, 0, sizeof(buttons));
-        std::memset(name, 0, sizeof(name));
-
-        for (int i = 0; i < kMaxAxes; ++i){
-          axes[i] = {0, 0, 0};
-        }
-
-        std::memset(&event, 0, sizeof(event));
+        axes[i] = { 0, 0, 0 };
       }
 
+      std::memset(&event, 0, sizeof(event));
+    }
   };
   struct Config
   {
@@ -77,31 +71,31 @@ private:
   void SetFeedback(const std::shared_ptr<sensor_msgs::msg::JoyFeedbackArray> msg);
 
   /**
-      * @brief Function to update joystick inputs
-      */
+   * @brief Function to update joystick inputs
+   */
   void JoystickUpdate();
 
   /**
-      * @brief Function to read joystick inputs
-      *
-      * @param joystick
-      */
-  void ReadJoystickInput(Joystick * joystick, Config * config);
+   * @brief Function to read joystick inputs
+   *
+   * @param joystick
+   */
+  void ReadJoystickInput(Joystick* joystick, Config* config);
 
   /**
-      * @brief Creat a joystick object
-      *
-      * @param fileName
-      *
-      */
-  void OpenJoystick(Joystick & joystick, const std::string & joyPath);
+   * @brief Creat a joystick object
+   *
+   * @param fileName
+   *
+   */
+  void OpenJoystick(Joystick& joystick, const std::string& joyPath);
 
   /**
-      * @brief Close Joystick
-      *
-      * @param joystick
-      */
-  void CloseJoystick(Joystick & joystick);
+   * @brief Close Joystick
+   *
+   * @param joystick
+   */
+  void CloseJoystick(Joystick& joystick);
 
 private:
   rclcpp::Publisher<sensor_msgs::msg::Joy>::SharedPtr joy_publisher_;
