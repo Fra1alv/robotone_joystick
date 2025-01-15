@@ -1,30 +1,46 @@
-#include <cstring>
-#include <fcntl.h>
-#include <unistd.h>
+/**
+ * Copyright (C) 2025 A. Freire
+ * 
+ * This file is part of RobotOne
+ * 
+ * RobotOne is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * RobotOne is distributed in the hope that it will be useful
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * @file robotone_joystick.cpp
+ * @version 0.0.1
+ * @date 2025-01-15
+ * @brief This C++ file implements a ROS2 node RobotoneJoystick to handle joystick inputs for the 
+ * Robotone project. It reads joystick events->button_state and axes), manages device connections, and 
+ * publishes the data using ROS2 messages. Additionally, it handles feedback from the system to c
+ * control joystick haptic responses.
+ * 
+ */
 #include <dirent.h>
-#include <sys/stat.h>
+#include <fcntl.h>
 #include <sys/inotify.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <cstring>
 #include <rclcpp/utilities.hpp>
 #include "robotone_joystick/robotone_joystick.hpp"
 
 using namespace robotone::teleop;
 
-
 /**
- * @file robotone_joystick.cpp
- * @brief Implementation of the RobotoneJoystick class.
- *
- * This file contains the implementation of the RobotoneJoystick class, which is responsible for
- * interfacing with a joystick device, processing joystick events, applying deadzones, and publishing
- * the joystick data to a ROS 2 topic. The class utilizes the ROS 2 framework, specifically the
- * rclcpp library, for node creation, parameter handling, timer management, and message publication.
- * It incorporates functionality to handle joystick initialization, read joystick input, detect
- * joystick events, apply deadzones to axis values, and publish the joystick data as Joy messages
- * to a specified topic.
- *
+ * @brief Construct a new Robotone Joystick and define the parameters
  */
 RobotoneJoystick::RobotoneJoystick(const std::string & name)
-: rclcpp::Node(name, rclcpp::NodeOptions().use_intra_process_comms(true))
+    : rclcpp::Node(name, rclcpp::NodeOptions().use_intra_process_comms(true))
 {
   RCLCPP_INFO(this->get_logger(), "Initiating RobotOne - RobotOne Joystick Node ...");
 
@@ -46,8 +62,8 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
   if (this->get_parameter("topic_name", config_.topic_name)) {
     if (config_.topic_name.get_type() == rclcpp::ParameterType::PARAMETER_STRING) {
       RCLCPP_INFO_EXPRESSION(
-        this->get_logger(), config_.debug.get_value<bool>() == true,
-        "Topic name is : %s", config_.topic_name.as_string().c_str());
+        this->get_logger(), config_.debug.get_value<bool>() == true, "Topic name is : %s",
+        config_.topic_name.as_string().c_str());
     } else if (config_.topic_name.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET) {
       RCLCPP_ERROR(this->get_logger(), "Parameter 'topic_name' is not set");
     } else if (config_.topic_name.get_value<std::string>().empty()) {
@@ -79,8 +95,8 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
 
   RCLCPP_WARN_EXPRESSION(
     this->get_logger(), config_.coalesce_interval.get_value<int>() < 0,
-    "%s: coalesce_interval (%s) is less than 0, it is going to be set to 0",
-    name.c_str(), config_.coalesce_interval.value_to_string().c_str());
+    "%s: coalesce_interval (%s) is less than 0, it is going to be set to 0", name.c_str(),
+    config_.coalesce_interval.value_to_string().c_str());
 
   if (config_.coalesce_interval.get_value<int>() < 0) {
     double zero_ = 0;
@@ -92,13 +108,13 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
   // we may need to use auto repeat
   RCLCPP_WARN_EXPRESSION(
     this->get_logger(), config_.autorepeat_rate.get_value<int>() < 0,
-    "%s: autorepeat_rate (%s) is less than 0, it is going to be set to 0",
-    name.c_str(), config_.autorepeat_rate.value_to_string().c_str());
+    "%s: autorepeat_rate (%s) is less than 0, it is going to be set to 0", name.c_str(),
+    config_.autorepeat_rate.value_to_string().c_str());
 
   RCLCPP_WARN_EXPRESSION(
     this->get_logger(), config_.autorepeat_rate.get_value<int>() > 1000,
-    "%s: autorepeat_rate (%s) is greater than 1000, it is going to be set to 1000",
-    name.c_str(), config_.autorepeat_rate.value_to_string().c_str());
+    "%s: autorepeat_rate (%s) is greater than 1000, it is going to be set to 1000", name.c_str(),
+    config_.autorepeat_rate.value_to_string().c_str());
 
   if (config_.autorepeat_rate.get_value<int>() < 0) {
     int zero_ = 0;
@@ -119,10 +135,8 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
     config_.autorepeat_rate.value_to_string().c_str());
 
   RCLCPP_INFO_EXPRESSION(
-    this->get_logger(),
-    config_.debug.get_value<bool>() == true, "Debug Mode: %s",
+    this->get_logger(), config_.debug.get_value<bool>() == true, "Debug Mode: %s",
     config_.debug.value_to_string().c_str());
-
 
   /**
    * @brief Initializes a timer to periodically call the JoystickUpdate() method.
@@ -133,21 +147,22 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
    * JoystickUpdate() to the timer callback, ensuring its execution within the context of the
    * RobotoneJoystick instance.
    */
-  update_timer_ =
-    create_wall_timer(
-    std::chrono::milliseconds(coalesce_interval), std::bind(
-      &RobotoneJoystick::JoystickUpdate,
-      this));
+  update_timer_ = create_wall_timer(
+    std::chrono::milliseconds(coalesce_interval),
+    std::bind(&RobotoneJoystick::JoystickUpdate, this));
 
   // Setup the joystick publisher
   joy_publisher_ =
     this->create_publisher<sensor_msgs::msg::Joy>(config_.topic_name.as_string(), 10);
 }
-
+/**
+ * @brief Destroy the Robotone Joystick:: Robotone Joystick object
+ * 
+ */
 RobotoneJoystick::~RobotoneJoystick()
 {
   // Close the joystick
-  if (joystick_.connected) {
+  if (joystick_.is_connected) {
     CloseJoystick(joystick_);
   }
 }
@@ -155,17 +170,6 @@ RobotoneJoystick::~RobotoneJoystick()
 /**
  * @brief Opens the joystick device and initializes its properties.
  *
- * This function attempts to open the joystick device specified by 'joyPath' and
- * initializes its properties. It iterates through the directory '/dev/input' to find
- * joystick devices starting with 'js'. For each found device, it checks if it matches
- * the specified 'joyPath' and opens the device in non-blocking mode. If successful, it
- * retrieves the joystick name and marks the joystick as connected.
- *
- * Additionally, it retrieves axis information for the connected joystick and sets up
- * the axis properties including minimum and maximum values.
- *
- * @param joystick A reference to the Joystick struct to store joystick information.
- * @param joyPath The path of the joystick device to be opened.
  */
 void RobotoneJoystick::OpenJoystick(Joystick & joystick, const std::string & joyPath)
 {
@@ -178,8 +182,7 @@ void RobotoneJoystick::OpenJoystick(Joystick & joystick, const std::string & joy
 
   // Check if the directory could be opened
   if (dev_dir == nullptr) {
-    RCLCPP_ERROR(this->get_logger(), "Couldn't open %s: %s:", path,
-    std::strerror(errno));
+    RCLCPP_ERROR(this->get_logger(), "Couldn't open %s: %s:", path, std::strerror(errno));
     closedir(dev_dir);
     return;
   }
@@ -201,14 +204,13 @@ void RobotoneJoystick::OpenJoystick(Joystick & joystick, const std::string & joy
       strncpy(joystick.name, "Unkown", sizeof(joystick_.name));
     }
 
-    joystick.connected = true;
+    joystick.is_connected = true;
 
     RCLCPP_INFO(this->get_logger(), "Found joystick: %s (%s).", joystick.name, joyPath.c_str());
-
   }
   // TODO verify if we need those data
   // Set up axis properties if the joystick is connected
-  if (joystick.connected) {
+  if (joystick.is_connected) {
     // Retrieve axis information for the connected joystick
     // Retrieve the number of supported Axes
     if (ioctl(joystick.file, JSIOCGAXES, &joystick.num_axes) == -1) {
@@ -219,51 +221,37 @@ void RobotoneJoystick::OpenJoystick(Joystick & joystick, const std::string & joy
     }
 
     RCLCPP_INFO(this->get_logger(), "Number of axes: %u", joystick.num_axes);
-
   }
   // Log no found joystick device
   RCLCPP_ERROR_EXPRESSION(
-    this->get_logger(), joystick.connected != true,
-    "No connected joystick found: %s", joyPath.c_str());
+    this->get_logger(), joystick.is_connected != true, "No connected joystick found: %s",
+    joyPath.c_str());
 
   closedir(dev_dir);
 }
 
 /**
- * @brief Closes the joystick device and resets its connection status.
- *
- * This function closes the file descriptor associated with the joystick device
- * to release system resources and then sets the 'connected' flag of the joystick
- * structure to false, indicating that the joystick device is no longer connected.
- *
- * @param joystick A reference to the Joystick struct representing the joystick device.
+ * @brief Close the file descriptor associated with the joystick device
  */
 void RobotoneJoystick::CloseJoystick(Joystick & joystick)
 {
   // Close the file descriptor associated with the joystick device
   close(joystick.file);
   // Reset the connection status flag
-  joystick.connected = false;
+  joystick.is_connected = false;
 }
-
 
 /**
  * @brief Reads input from the joystick file descriptor and processes joystick events.
  *
- * This function reads data from the joystick file descriptor and interprets it as
- * joystick events. It sets flags to indicate axis and button events and updates
- * corresponding data structures accordingly.
- *
- * @param joystick A pointer to the Joystick struct containing joystick information.
- * @param config A pointer to the Config struct containing configuration parameters.
  */
 void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
 {
   ssize_t bytes = read(joystick->file, &joystick->event, sizeof(joystick->event));
 
   // Reset flags
-  joystick->axis_event = false;
-  joystick->buttons_event = false;
+  joystick->has_axis_event = false;
+  joystick->has_buttons_event = false;
 
   // Min and Max
   double min_value = -32767.0;
@@ -282,12 +270,12 @@ void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
   if (bytes == sizeof(joystick->event)) {
     if (joystick->event.type & JS_EVENT_INIT) {
       // Handle joystick initialization event
-      joystick_.initialized = true;
-    } else if (joystick->initialized) {
+      joystick_.is_initialized = true;
+    } else if (joystick->is_initialized) {
       // Process joystick events after initialization
       if (joystick->event.type & JS_EVENT_BUTTON) {
-        joystick->buttons[joystick->event.number] = joystick->event.value;
-        joystick->buttons_event = true;
+        joystick->button_state[joystick->event.number] = joystick->event.value;
+        joystick->has_buttons_event = true;
         // Debug
         if (config->debug.get_value<bool>()) {
           RCLCPP_INFO(
@@ -301,13 +289,12 @@ void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
           axis_value = 0.0;
         } else {
           // Normalize the axis value
-          double normalized_value = 2 * (axis_value - min_value) /
-            (max_value - min_value) - 1;
+          double normalized_value = 2 * (axis_value - min_value) / (max_value - min_value) - 1;
           double scaled_value = normalized_value;
           axis_value = scaled_value;
         }
         joystick->axes[joystick->event.number].value = axis_value;
-        joystick->axis_event = true;
+        joystick->has_axis_event = true;
         // Debug
         if (config->debug.get_value<bool>()) {
           RCLCPP_INFO(
@@ -321,17 +308,9 @@ void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
 
 /**
  * @brief Continuously monitors joystick events using inotify and processes them.
- *
- * This function initializes an inotify instance to monitor changes in the "/dev/input" directory,
- * specifically for joystick-related events such as device addition or removal. It creates a separate
- * thread to read inotify events in a loop and processes them using the openJoystick function.
- * The function runs continuously until the node is shut down or an error occurs during event reading.
- *
- * In case of an initialization failure or an error during event reading, appropriate error messages
- * are logged, and cleanup is performed by closing the inotify descriptor.
- *
+ * 
  * @note The openJoystick function is called for each joystick event read, and it should handle any
- *       necessary processing or resource management related to the joystick events.
+  *       necessary processing or resource management related to the joystick events.
  */
 void RobotoneJoystick::JoystickUpdate()
 {
@@ -339,7 +318,7 @@ void RobotoneJoystick::JoystickUpdate()
   int watch_descriptor;
   char buffer[4096];
   struct inotify_event * event;
-  joystick_.initialized = false;
+  joystick_.is_initialized = false;
   rclcpp::Time last_pub = this->now();
 
   device_notify = inotify_init1(IN_NONBLOCK);
@@ -347,17 +326,16 @@ void RobotoneJoystick::JoystickUpdate()
   if (device_notify == -1) {
     RCLCPP_ERROR(this->get_logger(), "Error initializing inotify: %s", std::strerror(errno));
     exit(EXIT_FAILURE);
-    return; // Early exit if inotify fails
+    return;  // Early exit if inotify fails
   }
 
-  watch_descriptor = inotify_add_watch(
-    device_notify, "/dev/input",
-    IN_ATTRIB | IN_DELETE | IN_DELETE_SELF);
+  watch_descriptor =
+    inotify_add_watch(device_notify, "/dev/input", IN_ATTRIB | IN_DELETE | IN_DELETE_SELF);
   if (watch_descriptor == -1) {
     RCLCPP_ERROR(this->get_logger(), "Error adding inotify watch: %s", std::strerror(errno));
     close(device_notify);
     exit(EXIT_FAILURE);
-    return; // Early exit if watch fails
+    return;  // Early exit if watch fails
   }
 
   // Look if there is any new connection
@@ -365,7 +343,7 @@ void RobotoneJoystick::JoystickUpdate()
 
   while (rclcpp::ok()) {
     // We keep trying to connect every second until node shutdown or have a joystick connected.
-    while (!joystick_.connected) {
+    while (!joystick_.is_connected) {
       if (!rclcpp::ok()) {
         goto shutdown;
       }
@@ -378,30 +356,29 @@ void RobotoneJoystick::JoystickUpdate()
       OpenJoystick(joystick_, config_.dev.as_string().c_str());
     }
 
-    if (joystick_.connected) {
+    if (joystick_.is_connected) {
       event = reinterpret_cast<struct inotify_event *>(buffer);
 
       RCLCPP_ERROR_EXPRESSION(
-        this->get_logger(),
-        (event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) == 1,
+        this->get_logger(), (event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) == 1,
         "Joystick connection error");
 
       if (event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) {
-        joystick_.connected = false;
+        joystick_.is_connected = false;
         close(device_notify);
       } else {
         ReadJoystickInput(&joystick_, &config_);
 
-        if (joystick_.buttons_event || joystick_.axis_event) {
-          if (joystick_.buttons_event) {
+        if (joystick_.has_buttons_event || joystick_.has_axis_event) {
+          if (joystick_.has_buttons_event) {
             if (joystick_.event.number >= robotone_joy_msg_.buttons.size()) {
               // Resize the button vector and initialize new elements to 0.0
               robotone_joy_msg_.buttons.resize(joystick_.event.number + 1, 0.0);
             }
             robotone_joy_msg_.buttons[joystick_.event.number] =
-              (joystick_.buttons[joystick_.event.number] ? 1 : 0);
+              (joystick_.button_state[joystick_.event.number] ? 1 : 0);
           }
-          if (joystick_.axis_event) {
+          if (joystick_.has_axis_event) {
             if (joystick_.event.number >= robotone_joy_msg_.axes.size()) {
               // Resize the axis vector and initialize new elements to 0.0
               robotone_joy_msg_.axes.resize(joystick_.event.number + 1, 0.0);
@@ -420,9 +397,9 @@ void RobotoneJoystick::JoystickUpdate()
       if (config_.autorepeat_rate.get_value<int>() > 0) {
         rclcpp::Time now = this->now();
         rclcpp::Duration duration_ = now - last_pub;
-        if (RCL_NS_TO_MS(duration_.nanoseconds()) >=
-          (1000 / config_.autorepeat_rate.get_value<int>()))
-        {
+        if (
+          RCL_NS_TO_MS(duration_.nanoseconds()) >=
+          (1000 / config_.autorepeat_rate.get_value<int>())) {
           robotone_joy_msg_.header.stamp = this->now();
           robotone_joy_msg_.header.frame_id = config_.dev.as_string().c_str();
           joy_publisher_->publish(robotone_joy_msg_);

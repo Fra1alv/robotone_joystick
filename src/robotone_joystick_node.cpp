@@ -1,3 +1,27 @@
+/**
+ * Copyright (C) 2025 A. Freire
+ *
+ * This file is part of RobotOne
+ *
+ * RobotOne is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * RobotOne is distributed in the hope that it will be useful
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @file robotone_joystick_node.cpp
+ * @version 0.0.1
+ * @date 2025-01-15
+ * @brief
+ *
+ */
 #include <rclcpp/rclcpp.hpp>
 #include "robotone_joystick/robotone_joystick.hpp"
 
