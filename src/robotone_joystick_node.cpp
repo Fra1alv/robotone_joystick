@@ -17,26 +17,25 @@
  * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick_node.cpp
- * @version 0.0.1
- * @date 2025-01-15
+ * @version 0.0.0-alpha.1
+ * @date 2025-01-16
  * @brief
  *
  */
 #include <rclcpp/rclcpp.hpp>
 #include "robotone_joystick/robotone_joystick.hpp"
 
-int main(int argc, char * argv[])
-{
+int main(int argc, char* argv[]) {
   // Initialization
   rclcpp::init(argc, argv);
 
   // Set executor
   std::shared_ptr<rclcpp::Executor> executor =
-    std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+      std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
 
   // Creat Joystick node
-  auto joystick_node =
-    std::make_shared<robotone::teleop::RobotoneJoystick>("robotone_joystick_node");
+  auto joystick_node = std::make_shared<robotone::teleop::RobotoneJoystick>(
+      "robotone_joystick_node");
 
   // Run node
   executor->add_node(joystick_node);
