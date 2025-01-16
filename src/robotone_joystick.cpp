@@ -40,8 +40,9 @@ using namespace robotone::teleop;
 /**
  * @brief Construct a new Robotone Joystick and define the parameters
  */
-RobotoneJoystick::RobotoneJoystick(const std::string &name)
-    : rclcpp::Node(name, rclcpp::NodeOptions().use_intra_process_comms(true)) {
+RobotoneJoystick::RobotoneJoystick(const std::string & name)
+: rclcpp::Node(name, rclcpp::NodeOptions().use_intra_process_comms(true))
+{
   RCLCPP_INFO(this->get_logger(),
               "Initiating RobotOne - RobotOne Joystick Node ...");
 
@@ -62,12 +63,14 @@ RobotoneJoystick::RobotoneJoystick(const std::string &name)
   // Get the value of "topic_name"
   if (this->get_parameter("topic_name", config_.topic_name)) {
     if (config_.topic_name.get_type() ==
-        rclcpp::ParameterType::PARAMETER_STRING) {
+      rclcpp::ParameterType::PARAMETER_STRING)
+    {
       RCLCPP_INFO_EXPRESSION(
           this->get_logger(), config_.debug.get_value<bool>() == true,
           "Topic name is : %s", config_.topic_name.as_string().c_str());
     } else if (config_.topic_name.get_type() ==
-               rclcpp::ParameterType::PARAMETER_NOT_SET) {
+      rclcpp::ParameterType::PARAMETER_NOT_SET)
+    {
       RCLCPP_ERROR(this->get_logger(), "Parameter 'topic_name' is not set");
     } else if (config_.topic_name.get_value<std::string>().empty()) {
       RCLCPP_ERROR(this->get_logger(), "Parameter topic name is empty");
@@ -153,7 +156,7 @@ RobotoneJoystick::RobotoneJoystick(const std::string &name)
    * context of the RobotoneJoystick instance.
    */
   update_timer_ =
-      create_wall_timer(std::chrono::milliseconds(coalesce_interval),
+    create_wall_timer(std::chrono::milliseconds(coalesce_interval),
                         std::bind(&RobotoneJoystick::JoystickUpdate, this));
 
   // Setup the joystick publisher
@@ -164,7 +167,8 @@ RobotoneJoystick::RobotoneJoystick(const std::string &name)
  * @brief Destroy the Robotone Joystick:: Robotone Joystick object
  *
  */
-RobotoneJoystick::~RobotoneJoystick() {
+RobotoneJoystick::~RobotoneJoystick()
+{
   // Close the joystick
   if (joystick_.is_connected) {
     CloseJoystick(joystick_);
@@ -175,8 +179,10 @@ RobotoneJoystick::~RobotoneJoystick() {
  * @brief Opens the joystick device and initializes its properties.
  *
  */
-void RobotoneJoystick::OpenJoystick(Joystick &joystick,
-                                    const std::string &joyPath) {
+void RobotoneJoystick::OpenJoystick(
+  Joystick & joystick,
+  const std::string & joyPath)
+{
   const char path[] = "/dev/input";
   DIR *dev_dir;
   struct dirent *entry;
@@ -206,7 +212,8 @@ void RobotoneJoystick::OpenJoystick(Joystick &joystick,
     }
     // Retrieve the name of the joystick
     if (ioctl(joystick.file, JSIOCGNAME(sizeof(joystick.name)), joystick.name) <
-        0) {
+      0)
+    {
       strncpy(joystick.name, "Unkown", sizeof(joystick_.name));
     }
 
@@ -239,7 +246,8 @@ void RobotoneJoystick::OpenJoystick(Joystick &joystick,
 /**
  * @brief Close the file descriptor associated with the joystick device
  */
-void RobotoneJoystick::CloseJoystick(Joystick &joystick) {
+void RobotoneJoystick::CloseJoystick(Joystick & joystick)
+{
   // Close the file descriptor associated with the joystick device
   close(joystick.file);
   // Reset the connection status flag
@@ -251,9 +259,10 @@ void RobotoneJoystick::CloseJoystick(Joystick &joystick) {
  * events.
  *
  */
-void RobotoneJoystick::ReadJoystickInput(Joystick *joystick, Config *config) {
+void RobotoneJoystick::ReadJoystickInput(Joystick *joystick, Config *config)
+{
   ssize_t bytes =
-      read(joystick->file, &joystick->event, sizeof(joystick->event));
+    read(joystick->file, &joystick->event, sizeof(joystick->event));
 
   // Reset flags
   joystick->has_axis_event = false;
@@ -297,7 +306,7 @@ void RobotoneJoystick::ReadJoystickInput(Joystick *joystick, Config *config) {
         } else {
           // Normalize the axis value
           double normalized_value =
-              2 * (axis_value - min_value) / (max_value - min_value) - 1;
+            2 * (axis_value - min_value) / (max_value - min_value) - 1;
           double scaled_value = normalized_value;
           axis_value = scaled_value;
         }
@@ -321,7 +330,8 @@ void RobotoneJoystick::ReadJoystickInput(Joystick *joystick, Config *config) {
  * it should handle any necessary processing or resource management related to
  * the joystick events.
  */
-void RobotoneJoystick::JoystickUpdate() {
+void RobotoneJoystick::JoystickUpdate()
+{
   int device_notify;
   int watch_descriptor;
   char buffer[4096];
@@ -372,7 +382,7 @@ void RobotoneJoystick::JoystickUpdate() {
 
       RCLCPP_ERROR_EXPRESSION(
           this->get_logger(),
-          (event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) == 1,
+        (event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) == 1,
           "Joystick connection error");
 
       if (event->mask & IN_DELETE || event->mask & IN_DELETE_SELF) {
@@ -388,7 +398,7 @@ void RobotoneJoystick::JoystickUpdate() {
               robotone_joy_msg_.buttons.resize(joystick_.event.number + 1, 0.0);
             }
             robotone_joy_msg_.buttons[joystick_.event.number] =
-                (joystick_.button_state[joystick_.event.number] ? 1 : 0);
+              (joystick_.button_state[joystick_.event.number] ? 1 : 0);
           }
           if (joystick_.has_axis_event) {
             if (joystick_.event.number >= robotone_joy_msg_.axes.size()) {
@@ -396,7 +406,7 @@ void RobotoneJoystick::JoystickUpdate() {
               robotone_joy_msg_.axes.resize(joystick_.event.number + 1, 0.0);
             }
             robotone_joy_msg_.axes[joystick_.event.number] =
-                (joystick_.axes[joystick_.event.number].value);
+              (joystick_.axes[joystick_.event.number].value);
           }
           robotone_joy_msg_.header.stamp = this->now();
           robotone_joy_msg_.header.frame_id = config_.dev.as_string().c_str();
@@ -410,7 +420,8 @@ void RobotoneJoystick::JoystickUpdate() {
         rclcpp::Time now = this->now();
         rclcpp::Duration duration_ = now - last_pub;
         if (RCL_NS_TO_MS(duration_.nanoseconds()) >=
-            (1000 / config_.autorepeat_rate.get_value<int>())) {
+          (1000 / config_.autorepeat_rate.get_value<int>()))
+        {
           robotone_joy_msg_.header.stamp = this->now();
           robotone_joy_msg_.header.frame_id = config_.dev.as_string().c_str();
           joy_publisher_->publish(robotone_joy_msg_);

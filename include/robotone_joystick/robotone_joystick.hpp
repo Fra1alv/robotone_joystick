@@ -42,21 +42,23 @@
  * @brief Group for joystick-related methods
  *
  */
-namespace robotone {
-namespace teleop {
+namespace robotone
+{
+namespace teleop
+{
 /**
  * @brief Class to handle joystick input and publish events for the Robotone
  * project.
  *
  */
 class RobotoneJoystick : public rclcpp::Node {
- public:
+public:
   /**
    * @brief Construct a new Robotone Joystick object
    *
    * @param name Name of ROS2 Node
    */
-  RobotoneJoystick(const std::string& name);
+  RobotoneJoystick(const std::string & name);
 
   /**
    * @brief Destroy the Robotone Joystick object
@@ -66,13 +68,14 @@ class RobotoneJoystick : public rclcpp::Node {
    */
   ~RobotoneJoystick();
 
- public:
+public:
   /**
    * @brief Struct to store axis configuration, including minimum, maximum, and
    * current values.
    *
    */
-  struct AxisConfig {
+  struct AxisConfig
+  {
     short min;    ///< Minimum value of the axis.
     short max;    ///< Maximum value of the axis.
     short value;  ///< Current value of the axis.
@@ -83,10 +86,11 @@ class RobotoneJoystick : public rclcpp::Node {
    * axes.
    *
    */
-  struct Joystick {
+  struct Joystick
+  {
     static const int kMaxAxes = 32;  ///< Maximum number of axis supported.
     static const int kMaxButtons =
-        32;  ///< Maximum number of buttons supported.
+      32;    ///< Maximum number of buttons supported.
 
     bool has_axis_event;     ///< Flag to indicate if an axis event ocurred.
     bool has_buttons_event;  ///< Flag to indicate if a button event ocurred.
@@ -105,12 +109,13 @@ class RobotoneJoystick : public rclcpp::Node {
      *
      */
     Joystick()
-        : has_axis_event(false),
-          has_buttons_event(false),
-          should_publish(false),
-          is_connected(false),
-          is_initialized(false),
-          file(-1) {
+    : has_axis_event(false),
+      has_buttons_event(false),
+      should_publish(false),
+      is_connected(false),
+      is_initialized(false),
+      file(-1)
+    {
       std::memset(button_state, 0, sizeof(button_state));
       std::memset(name, 0, sizeof(name));
 
@@ -125,19 +130,20 @@ class RobotoneJoystick : public rclcpp::Node {
    * @brief Struct to store configuration parameters for the joystick.
    *
    */
-  struct Config {
+  struct Config
+  {
     rclcpp::Parameter
-        topic_name;           ///< Name of the topic to publish joystick data.
+      topic_name;             ///< Name of the topic to publish joystick data.
     rclcpp::Parameter debug;  ///< Debug flag.
     rclcpp::Parameter dev;    ///< Joystick device path
     rclcpp::Parameter
-        autorepeat_rate;  ///< Rate at which to autorepeat joystick events.
+      autorepeat_rate;    ///< Rate at which to autorepeat joystick events.
     rclcpp::Parameter
-        coalesce_interval;       ///< Interval to coalesce multiple events.
+      coalesce_interval;         ///< Interval to coalesce multiple events.
     rclcpp::Parameter deadzone;  ///< Deadzone value for the joystick.
   };
 
- private:
+private:
   // TODO: Needs to be implemented
   /**
    *
@@ -147,7 +153,7 @@ class RobotoneJoystick : public rclcpp::Node {
    * @ingroup joystick_methods
    */
   void SetFeedback(
-      const std::shared_ptr<sensor_msgs::msg::JoyFeedbackArray> msg);
+    const std::shared_ptr<sensor_msgs::msg::JoyFeedbackArray> msg);
 
   /**
    * @brief Function to update joystick inputs
@@ -182,7 +188,7 @@ class RobotoneJoystick : public rclcpp::Node {
    * parameters.
    * @ingroup joystick_methods
    */
-  void ReadJoystickInput(Joystick* joystick, Config* config);
+  void ReadJoystickInput(Joystick * joystick, Config * config);
 
   /**
    * @brief Opens the joystick device and initializes its properties.
@@ -202,7 +208,7 @@ class RobotoneJoystick : public rclcpp::Node {
    * @param joyPath The path of the joystick device to be opened.
    * @ingroup joystick_methods
    */
-  void OpenJoystick(Joystick& joystick, const std::string& joyPath);
+  void OpenJoystick(Joystick & joystick, const std::string & joyPath);
 
   /**
    * @brief Close the joystick device.
@@ -210,13 +216,13 @@ class RobotoneJoystick : public rclcpp::Node {
    * @param joystick Reference to the Joystick object to be closed.
    * @ingroup joystick_methods
    */
-  void CloseJoystick(Joystick& joystick);
+  void CloseJoystick(Joystick & joystick);
 
- private:
+private:
   rclcpp::Publisher<sensor_msgs::msg::Joy>::SharedPtr
-      joy_publisher_;  ///< Publisher for joystick messages.
+    joy_publisher_;    ///< Publisher for joystick messages.
   rclcpp::Subscription<sensor_msgs::msg::JoyFeedbackArray>::SharedPtr
-      joy_subscriber_;  ///< Subscriber for joystick feedback.
+    joy_subscriber_;    ///< Subscriber for joystick feedback.
   sensor_msgs::msg::Joy robotone_joy_msg_;  ///< Message to store joystick data.
   rclcpp::TimerBase::SharedPtr update_timer_;  ///< Timer for periodic updates.
   Joystick joystick_;  ///< Joystick object to manage joystick state.
