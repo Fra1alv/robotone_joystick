@@ -1,29 +1,29 @@
 /**
  * Copyright (C) 2025 A. Freire
- * 
+ *
  * This file is part of RobotOne
- * 
+ *
  * RobotOne is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * RobotOne is distributed in the hope that it will be useful
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * @file robotone_joystick.cpp
  * @version 0.0.1
  * @date 2025-01-15
- * @brief This C++ file implements a ROS2 node RobotoneJoystick to handle joystick inputs for the 
- * Robotone project. It reads joystick events->button_state and axes), manages device connections, and 
+ * @brief This C++ file implements a ROS2 node RobotoneJoystick to handle joystick inputs for the
+ * Robotone project. It reads joystick events->button_state and axes), manages device connections, and
  * publishes the data using ROS2 messages. Additionally, it handles feedback from the system to c
  * control joystick haptic responses.
- * 
+ *
  */
 #include <dirent.h>
 #include <fcntl.h>
@@ -40,7 +40,7 @@ using namespace robotone::teleop;
  * @brief Construct a new Robotone Joystick and define the parameters
  */
 RobotoneJoystick::RobotoneJoystick(const std::string & name)
-    : rclcpp::Node(name, rclcpp::NodeOptions().use_intra_process_comms(true))
+: rclcpp::Node(name, rclcpp::NodeOptions().use_intra_process_comms(true))
 {
   RCLCPP_INFO(this->get_logger(), "Initiating RobotOne - RobotOne Joystick Node ...");
 
@@ -157,7 +157,7 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
 }
 /**
  * @brief Destroy the Robotone Joystick:: Robotone Joystick object
- * 
+ *
  */
 RobotoneJoystick::~RobotoneJoystick()
 {
@@ -308,7 +308,7 @@ void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
 
 /**
  * @brief Continuously monitors joystick events using inotify and processes them.
- * 
+ *
  * @note The openJoystick function is called for each joystick event read, and it should handle any
   *       necessary processing or resource management related to the joystick events.
  */
@@ -399,7 +399,8 @@ void RobotoneJoystick::JoystickUpdate()
         rclcpp::Duration duration_ = now - last_pub;
         if (
           RCL_NS_TO_MS(duration_.nanoseconds()) >=
-          (1000 / config_.autorepeat_rate.get_value<int>())) {
+          (1000 / config_.autorepeat_rate.get_value<int>()))
+        {
           robotone_joy_msg_.header.stamp = this->now();
           robotone_joy_msg_.header.frame_id = config_.dev.as_string().c_str();
           joy_publisher_->publish(robotone_joy_msg_);

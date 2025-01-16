@@ -19,9 +19,9 @@
  * @file robotone_joystick.hpp
  * @version 0.0.1
  * @date 2025-01-15
- * @brief This C++ header file defines a ROS2 node called RobotoneJoystick to handle joystick inputs 
- * for the Robotone project. The node manages joystick connections, reads input data 
- * (buttons and axes), and publishes the data as ROS2 messages. It also includes methods for 
+ * @brief This C++ header file defines a ROS2 node called RobotoneJoystick to handle joystick inputs
+ * for the Robotone project. The node manages joystick connections, reads input data
+ * (buttons and axes), and publishes the data as ROS2 messages. It also includes methods for
  * feedback handling, input reading, and device management.
  *
  */
@@ -39,7 +39,7 @@
 /**
  * @defgroup joystick_methods Joystick Methods
  * @brief Group for joystick-related methods
- * 
+ *
  */
 namespace robotone
 {
@@ -47,30 +47,30 @@ namespace teleop
 {
 /**
  * @brief Class to handle joystick input and publish events for the Robotone project.
- * 
+ *
  */
 class RobotoneJoystick : public rclcpp::Node
 {
 public:
   /**
    * @brief Construct a new Robotone Joystick object
-   * 
+   *
    * @param name Name of ROS2 Node
    */
   RobotoneJoystick(const std::string & name);
 
   /**
    * @brief Destroy the Robotone Joystick object
-   * 
+   *
    * @param none
-   * 
+   *
    */
   ~RobotoneJoystick();
 
 public:
   /**
    * @brief Struct to store axis configuration, including minimum, maximum, and current values.
-   * 
+   *
    */
   struct AxisConfig
   {
@@ -79,9 +79,9 @@ public:
     short value;  ///< Current value of the axis.
   };
 
-  /** 
+  /**
    * @brief Struct to represent the state of the joystick, including buttons and axes.
-   * 
+   *
    */
   struct Joystick
   {
@@ -102,15 +102,15 @@ public:
 
     /**
      * @brief Construct a new Joystick object
-     * 
+     *
      */
     Joystick()
-        : has_axis_event(false),
-          has_buttons_event(false),
-          should_publish(false),
-          is_connected(false),
-          is_initialized(false),
-          file(-1)
+    : has_axis_event(false),
+      has_buttons_event(false),
+      should_publish(false),
+      is_connected(false),
+      is_initialized(false),
+      file(-1)
     {
       std::memset(button_state, 0, sizeof(button_state));
       std::memset(name, 0, sizeof(name));
@@ -124,7 +124,7 @@ public:
   };
   /**
    * @brief Struct to store configuration parameters for the joystick.
-   * 
+   *
    */
   struct Config
   {
@@ -139,17 +139,17 @@ public:
 private:
   //TODO: Needs to be implemented
   /**
-   * 
+   *
    * @brief Set the Feedback object
-   * 
+   *
    * @param msg
-   * @ingroup joystick_methods 
+   * @ingroup joystick_methods
    */
   void SetFeedback(const std::shared_ptr<sensor_msgs::msg::JoyFeedbackArray> msg);
 
   /**
   * @brief Function to update joystick inputs
-  * 
+  *
   * This function initializes an inotify instance to monitor changes in the "/dev/input" directory,
   * specifically for joystick-related events such as device addition or removal. It creates a separate
   * thread to read inotify events in a loop and processes them using the openJoystick function.
@@ -157,7 +157,7 @@ private:
   *
   * In case of an initialization failure or an error during event reading, appropriate error messages
   * are logged, and cleanup is performed by closing the inotify descriptor.
-  * 
+  *
   * @param none
   * @ingroup joystick_methods
    */
@@ -165,7 +165,7 @@ private:
 
   /**
   * @brief Reads input from the joystick file descriptor and processes joystick events.
-  * 
+  *
   * This function reads data from the joystick file descriptor and interprets it as
   * joystick events. It sets flags to indicate axis and button events and updates
   * corresponding data structures accordingly.
@@ -196,7 +196,7 @@ private:
 
   /**
    * @brief Close the joystick device.
-   * 
+   *
    * @param joystick Reference to the Joystick object to be closed.
    * @ingroup joystick_methods
    */
