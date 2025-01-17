@@ -99,7 +99,7 @@ Contributions are welcome! Please follow these steps:
 3. Submit a pull request with a detailed description of your changes.
 
 ## License
-This project is licensed under the [GNU GPL v3 License](../../LICENSE).
+This project is licensed under the [GPLv3 License](../../LICENSE).
 
 ## Contact
 For support or questions, feel free to reach out:

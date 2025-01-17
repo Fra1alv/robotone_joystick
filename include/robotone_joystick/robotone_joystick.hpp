@@ -17,8 +17,9 @@
  * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick.hpp
- * @version 0.0.0-alpha.1
+ * @version 0.0.1
  * @date 2025-01-16
+ * @note No notes add by developer
  * @brief This C++ header file defines a ROS2 node called RobotoneJoystick to
  * handle joystick inputs for the Robotone project. The node manages joystick
  * connections, reads input data (buttons and axes), and publishes the data as
@@ -30,6 +31,7 @@
 #define ROBOTONE_JOYSTICK__ROBOTONE_JOYSTICK_HPP_
 
 #include <linux/joystick.h>
+
 #include <memory>
 #include <rclcpp/executors/single_threaded_executor.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -51,7 +53,8 @@ namespace teleop
  * project.
  *
  */
-class RobotoneJoystick : public rclcpp::Node {
+class RobotoneJoystick : public rclcpp::Node
+{
 public:
   /**
    * @brief Construct a new Robotone Joystick object
@@ -88,21 +91,20 @@ public:
    */
   struct Joystick
   {
-    static const int kMaxAxes = 32;  ///< Maximum number of axis supported.
-    static const int kMaxButtons =
-      32;    ///< Maximum number of buttons supported.
+    static const int kMaxAxes = 32;     ///< Maximum number of axis supported.
+    static const int kMaxButtons = 32;  ///< Maximum number of buttons supported.
 
-    bool has_axis_event;     ///< Flag to indicate if an axis event ocurred.
-    bool has_buttons_event;  ///< Flag to indicate if a button event ocurred.
-    bool should_publish;     ///< Flag to indicate if data should be published.
-    bool is_connected;       ///< Flag to indicate if joystick is connected.
-    bool is_initialized;  ///< Flag to indicate if joystick is is_initialized.
+    bool has_axis_event;             ///< Flag to indicate if an axis event ocurred.
+    bool has_buttons_event;          ///< Flag to indicate if a button event ocurred.
+    bool should_publish;             ///< Flag to indicate if data should be published.
+    bool is_connected;               ///< Flag to indicate if joystick is connected.
+    bool is_initialized;             ///< Flag to indicate if joystick is is_initialized.
     bool button_state[kMaxButtons];  ///< Array to store button states.
     AxisConfig axes[kMaxAxes];       ///< Array to store axis configurations.
     char name[128];                  ///< Name of the joystick device.
-    int file;               ///< File descriptor for the joystick device.
-    int num_axes;           ///< Number of axes detected.
-    struct js_event event;  ///< Struct to store the latest joystick event.
+    int file;                        ///< File descriptor for the joystick device.
+    int num_axes;                    ///< Number of axes detected.
+    struct js_event event;           ///< Struct to store the latest joystick event.
 
     /**
      * @brief Construct a new Joystick object
@@ -132,15 +134,12 @@ public:
    */
   struct Config
   {
-    rclcpp::Parameter
-      topic_name;             ///< Name of the topic to publish joystick data.
-    rclcpp::Parameter debug;  ///< Debug flag.
-    rclcpp::Parameter dev;    ///< Joystick device path
-    rclcpp::Parameter
-      autorepeat_rate;    ///< Rate at which to autorepeat joystick events.
-    rclcpp::Parameter
-      coalesce_interval;         ///< Interval to coalesce multiple events.
-    rclcpp::Parameter deadzone;  ///< Deadzone value for the joystick.
+    rclcpp::Parameter topic_name;         ///< Name of the topic to publish joystick data.
+    rclcpp::Parameter debug;              ///< Debug flag.
+    rclcpp::Parameter dev;                ///< Joystick device path
+    rclcpp::Parameter autorepeat_rate;    ///< Rate at which to autorepeat joystick events.
+    rclcpp::Parameter coalesce_interval;  ///< Interval to coalesce multiple events.
+    rclcpp::Parameter deadzone;           ///< Deadzone value for the joystick.
   };
 
 private:
@@ -152,8 +151,7 @@ private:
    * @param msg
    * @ingroup joystick_methods
    */
-  void SetFeedback(
-    const std::shared_ptr<sensor_msgs::msg::JoyFeedbackArray> msg);
+  void SetFeedback(const std::shared_ptr<sensor_msgs::msg::JoyFeedbackArray> msg);
 
   /**
    * @brief Function to update joystick inputs
@@ -220,13 +218,13 @@ private:
 
 private:
   rclcpp::Publisher<sensor_msgs::msg::Joy>::SharedPtr
-    joy_publisher_;    ///< Publisher for joystick messages.
+    joy_publisher_;  ///< Publisher for joystick messages.
   rclcpp::Subscription<sensor_msgs::msg::JoyFeedbackArray>::SharedPtr
-    joy_subscriber_;    ///< Subscriber for joystick feedback.
-  sensor_msgs::msg::Joy robotone_joy_msg_;  ///< Message to store joystick data.
+    joy_subscriber_;                           ///< Subscriber for joystick feedback.
+  sensor_msgs::msg::Joy robotone_joy_msg_;     ///< Message to store joystick data.
   rclcpp::TimerBase::SharedPtr update_timer_;  ///< Timer for periodic updates.
-  Joystick joystick_;  ///< Joystick object to manage joystick state.
-  Config config_;      ///< Configuration object to store parameters.
+  Joystick joystick_;                          ///< Joystick object to manage joystick state.
+  Config config_;                              ///< Configuration object to store parameters.
 };
 }  // end namespace teleop
 
