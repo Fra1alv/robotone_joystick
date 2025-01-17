@@ -36,6 +36,11 @@ install(DIRECTORY config
   DESTINATION share/${PROJECT_NAME}
 )
 
+# install the launch directory
+install(DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
 install(TARGETS
 robotone_joystick_node
   DESTINATION lib/${PROJECT_NAME}
