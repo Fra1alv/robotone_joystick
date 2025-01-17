@@ -1,24 +1,39 @@
 # RobotOne Joystick Package
 
+- [RobotOne Joystick Package](#robotone-joystick-package)
+  - [Overview](#overview)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [Usage](#usage)
+  - [Directory Structure](#directory-structure)
+  - [Testing](#testing)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Contact](#contact)
+
+
 ## Overview
-The `robotone_joystick` package provides joystick control for the RobotOne system. It enables users to interact with the RobotOne platform using an Xbox controller for intuitive operation and testing.
+The `robotone_joystick` package provides joystick control for the RobotOne system. It enables users to interact with the RobotOne platform using an Xbox controller for operation and testing. This package runs only on Linux system.
 
 Key features include:
-- Seamless integration with ROS2 nodes
-- Configurable joystick mapping for flexible control
+- Crete Joystick node
+- Publish Joystick message (sensor_msgs/msg/joy)
+- Configurable joystick interface
 
 ## Prerequisites
 Ensure the following dependencies are installed:
-- ROS2 (e.g., Humble, Foxy, or Rolling)
-- `joy` and `teleop_twist_joy` ROS2 packages
-- SDL2 library (for Linux systems)
+- ROS2 (Humble or above)
+- Python 3
 
+
+TODO: Verify installation procedure
 ## Installation
 
 1. Clone the repository into your ROS2 workspace:
    ```bash
    cd ~/ros2_ws/src
-   git clone https://github.com/your-username/robotone_joystick.git
+   git clone https://github.com/fra1alv/robotone_joystick.git
    ```
 
 2. Build the workspace:
@@ -34,9 +49,9 @@ Ensure the following dependencies are installed:
    ```
 
 ## Configuration
-The `robotone_joystick` package uses a configuration file to map joystick inputs to specific actions. The default configuration file is located at `config/xbox_config.yaml`.
+The `robotone_joystick` package uses a configuration file to setup an interface with a joystick and process its input, then publishes it joy meassage. The default configuration file is located at `config/xbox_config.yaml`.
 
-You can customize the mappings by editing this file:
+You can customize the parameters by editing this file:
 ```yaml
 robotone_joystick_node:
   ros__parameters:
@@ -48,12 +63,12 @@ robotone_joystick_node:
     deadzone: 0.05
 
 ```
-
+TODO: Verify the three steps for usage
 ## Usage
 
 1. Launch the joystick node:
    ```bash
-   ros2 launch robotone_joystick joystick_control.launch.py
+   ros2 launch robotone_joystick joystick_control_launch.py
    ```
 
 2. Connect your Xbox controller and ensure it is recognized by the system. For Linux, verify using:

@@ -144,6 +144,9 @@ public:
 
 private:
   // TODO: Needs to be implemented
+  // NOTE: The idea is to use this for proximity alert. Using some sort of the sensor that
+  // detect if there some object/barrier too close to the robot buddy. It needs to be done after
+  // finishing the implementation of robotone_teleop
   /**
    *
    * @brief Set the Feedback object

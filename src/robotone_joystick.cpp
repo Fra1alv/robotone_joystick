@@ -94,7 +94,7 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
   }
 
   // Get the value of the "coalesce_interval" parameter
-  // TODO we may need to use it to reduce the number of messages
+  // NOTE: We might need to use it to reduce the number of messages
   int coalesce_interval = config_.coalesce_interval.get_value<int>();
 
   RCLCPP_WARN_EXPRESSION(
@@ -400,8 +400,7 @@ void RobotoneJoystick::JoystickUpdate()
         rclcpp::Duration duration_ = now - last_pub;
         if (
           RCL_NS_TO_MS(duration_.nanoseconds()) >=
-          (1000 / config_.autorepeat_rate.get_value<int>()))
-        {
+          (1000 / config_.autorepeat_rate.get_value<int>())) {
           robotone_joy_msg_.header.stamp = this->now();
           robotone_joy_msg_.header.frame_id = config_.dev.as_string().c_str();
           joy_publisher_->publish(robotone_joy_msg_);
