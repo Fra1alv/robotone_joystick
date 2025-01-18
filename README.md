@@ -63,22 +63,26 @@ robotone_joystick_node:
     deadzone: 0.05
 
 ```
-TODO: Verify the three steps for usage
 ## Usage
 
 1. Launch the joystick node:
    ```bash
    ros2 launch robotone_joystick joystick_control_launch.py
    ```
-
-2. Connect your Xbox controller and ensure it is recognized by the system. For Linux, verify using:
+   Note: xBox controller is default in future we might have different controllers.
+2. Verify the node list
    ```bash
-   jstest /dev/input/js0
+   ros2 node list
    ```
-
-3. Control the RobotOne system using the joystick. By default:
-   - Left joystick controls linear motion.
-   - Right joystick controls angular motion.
+   Node: you must to find the node robotone_joystick_node
+3. List topics published by a node:
+    ```bash
+    ros2 node info /robotone_joystick_node
+4. Listen to the topic
+   ```bash
+   ros2 topic echo /robotone_joystick
+   ```
+   Note: Topic name can be set on the config file
 
 ## Directory Structure
 ```plaintext
@@ -97,7 +101,7 @@ robotone_joystick/
 ├── package.xml                         # Project documentation
 └── README.md                           # ROS2 package manifest
 ```
-
+TODO Define test procedure
 ## Testing
 To test the joystick functionality:
 1. Run the joystick node in simulation mode:

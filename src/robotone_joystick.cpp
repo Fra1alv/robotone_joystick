@@ -17,9 +17,9 @@
  * along with RobotOne.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick.cpp
- * @version 0.0.16
- * @date 2025-01-17
- * @note Update CMakeList.txt file: Install launch directory
+ * @version 0.0.11
+ * @date 2025-01-18
+ * @note Created a script for testing
  * @brief This C++ file implements a ROS2 node RobotoneJoystick to handle
  * joystick inputs for the Robotone project. It reads joystick
  * events->button_state and axes), manages device connections, and publishes the
@@ -308,7 +308,7 @@ void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
  * @brief Continuously monitors joystick events using inotify and processes
  * them.
  *
- * @note Update CMakeList.txt file: Install launch directory
+ * @note Created a script for testing
  * it should handle any necessary processing or resource management related to
  * the joystick events.
  */
@@ -400,7 +400,8 @@ void RobotoneJoystick::JoystickUpdate()
         rclcpp::Duration duration_ = now - last_pub;
         if (
           RCL_NS_TO_MS(duration_.nanoseconds()) >=
-          (1000 / config_.autorepeat_rate.get_value<int>())) {
+          (1000 / config_.autorepeat_rate.get_value<int>()))
+        {
           robotone_joy_msg_.header.stamp = this->now();
           robotone_joy_msg_.header.frame_id = config_.dev.as_string().c_str();
           joy_publisher_->publish(robotone_joy_msg_);

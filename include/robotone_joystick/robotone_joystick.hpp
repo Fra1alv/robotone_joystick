@@ -17,9 +17,9 @@
  * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick.hpp
- * @version 0.0.16
- * @date 2025-01-17
- * @note Update CMakeList.txt file: Install launch directory
+ * @version 0.0.11
+ * @date 2025-01-18
+ * @note Created a script for testing
  * @brief This C++ header file defines a ROS2 node called RobotoneJoystick to
  * handle joystick inputs for the Robotone project. The node manages joystick
  * connections, reads input data (buttons and axes), and publishes the data as
