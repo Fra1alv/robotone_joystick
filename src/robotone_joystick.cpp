@@ -17,9 +17,9 @@
  * along with RobotOne.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick.cpp
- * @version 0.0.11
- * @date 2025-01-18
- * @note Created a script for testing
+ * @version 0.0.12
+ * @date 2025-01-19
+ * @note Deleted test folder
  * @brief This C++ file implements a ROS2 node RobotoneJoystick to handle
  * joystick inputs for the Robotone project. It reads joystick
  * events->button_state and axes), manages device connections, and publishes the
@@ -308,7 +308,7 @@ void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
  * @brief Continuously monitors joystick events using inotify and processes
  * them.
  *
- * @note Created a script for testing
+ * @note Deleted test folder
  * it should handle any necessary processing or resource management related to
  * the joystick events.
  */

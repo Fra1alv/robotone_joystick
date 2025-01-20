@@ -17,9 +17,9 @@
  * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick.hpp
- * @version 0.0.11
- * @date 2025-01-18
- * @note Created a script for testing
+ * @version 0.0.12
+ * @date 2025-01-19
+ * @note Deleted test folder
  * @brief This C++ header file defines a ROS2 node called RobotoneJoystick to
  * handle joystick inputs for the Robotone project. The node manages joystick
  * connections, reads input data (buttons and axes), and publishes the data as
@@ -142,7 +142,7 @@ public:
     rclcpp::Parameter deadzone;           ///< Deadzone value for the joystick.
   };
 
-private:
+protected:
   // TODO: Needs to be implemented
   // NOTE: The idea is to use this for proximity alert. Using some sort of the sensor that
   // detect if there some object/barrier too close to the robot buddy. It needs to be done after

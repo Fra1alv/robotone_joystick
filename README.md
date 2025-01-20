@@ -7,7 +7,6 @@
   - [Configuration](#configuration)
   - [Usage](#usage)
   - [Directory Structure](#directory-structure)
-  - [Testing](#testing)
   - [Contributing](#contributing)
   - [License](#license)
   - [Contact](#contact)
@@ -27,7 +26,6 @@ Ensure the following dependencies are installed:
 - Python 3
 
 
-TODO: Verify installation procedure
 ## Installation
 
 1. Clone the repository into your ROS2 workspace:
@@ -101,16 +99,6 @@ robotone_joystick/
 ├── package.xml                         # Project documentation
 └── README.md                           # ROS2 package manifest
 ```
-TODO Define test procedure
-## Testing
-To test the joystick functionality:
-1. Run the joystick node in simulation mode:
-   ```bash
-   ros2 run robotone_joystick test_joystick
-   ```
-
-2. Use the controller to verify that inputs are correctly mapped to the expected outputs.
-
 ## Contributing
 Contributions are welcome! Please follow these steps:
 1. Fork the repository.

@@ -17,9 +17,9 @@
  * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick_node.cpp
- * @version 0.0.11
- * @date 2025-01-18
- * @note Created a script for testing
+ * @version 0.0.12
+ * @date 2025-01-19
+ * @note Deleted test folder
  * @brief
  *
  */
