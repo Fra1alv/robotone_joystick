@@ -391,7 +391,8 @@ void RobotoneJoystick::JoystickUpdate()
         rclcpp::Duration duration_ = now - last_pub;
         if (
           RCL_NS_TO_MS(duration_.nanoseconds()) >=
-          (1000 / config_.autorepeat_rate.get_value<int>())) {
+          (1000 / config_.autorepeat_rate.get_value<int>()))
+        {
           robotone_joy_msg_.header.stamp = this->now();
           robotone_joy_msg_.header.frame_id = config_.dev.as_string().c_str();
           joy_publisher_->publish(robotone_joy_msg_);
