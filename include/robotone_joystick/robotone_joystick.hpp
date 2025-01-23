@@ -17,9 +17,9 @@
  * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick.hpp
- * @version 0.0.12
- * @date 2025-01-19
- * @note Deleted test folder
+ * @version 0.0.13
+ * @date 2025-01-23
+ * @note Update number of buttons and axis for joy_msg
  * @brief This C++ header file defines a ROS2 node called RobotoneJoystick to
  * handle joystick inputs for the Robotone project. The node manages joystick
  * connections, reads input data (buttons and axes), and publishes the data as
@@ -104,7 +104,8 @@ public:
     char name[128];                  ///< Name of the joystick device.
     int file;                        ///< File descriptor for the joystick device.
     int num_axes;                    ///< Number of axes detected.
-    struct js_event event;           ///< Struct to store the latest joystick event.
+    int num_buttons;
+    struct js_event event;  ///< Struct to store the latest joystick event.
 
     /**
      * @brief Construct a new Joystick object
