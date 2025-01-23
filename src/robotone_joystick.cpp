@@ -103,10 +103,7 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
     config_.coalesce_interval.value_to_string().c_str());
 
   if (config_.coalesce_interval.get_value<int>() < 0) {
-    double zero_ = 0;
-    std::vector<rclcpp::Parameter> parameters;
-    parameters.push_back(rclcpp::Parameter("coalesce_interval", zero_));
-    this->set_parameters(parameters);
+    this->set_parameters({rclcpp::Parameter("coalesce_interval", 0.0)});
   }
 
   // we may need to use auto repeat
@@ -122,17 +119,11 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
     name.c_str(), config_.autorepeat_rate.value_to_string().c_str());
 
   if (config_.autorepeat_rate.get_value<int>() < 0) {
-    int zero_ = 0;
-    std::vector<rclcpp::Parameter> parameters;
-    parameters.push_back(rclcpp::Parameter("autorepeat_rate", zero_));
-    this->set_parameters(parameters);
+    this->set_parameters({rclcpp::Parameter("autorepeat_rate", 0)});
   }
 
   if (config_.autorepeat_rate.get_value<int>() < 0) {
-    int thousand_ = 1000;
-    std::vector<rclcpp::Parameter> parameters;
-    parameters.push_back(rclcpp::Parameter("autorepeat_rate", thousand_));
-    this->set_parameters(parameters);
+    this->set_parameters({rclcpp::Parameter("autorepeat_rate", 1000)});
   }
 
   RCLCPP_INFO(
@@ -143,7 +134,7 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
     this->get_logger(), config_.debug.get_value<bool>() == true, "Debug Mode: %s",
     config_.debug.value_to_string().c_str());
 
-  // nitializes a timer to periodically call the JoystickUpdate() method.
+  // Initializes a timer to periodically call the JoystickUpdate() method.
   update_timer_ = create_wall_timer(
     std::chrono::milliseconds(coalesce_interval),
     std::bind(&RobotoneJoystick::JoystickUpdate, this));
@@ -400,8 +391,7 @@ void RobotoneJoystick::JoystickUpdate()
         rclcpp::Duration duration_ = now - last_pub;
         if (
           RCL_NS_TO_MS(duration_.nanoseconds()) >=
-          (1000 / config_.autorepeat_rate.get_value<int>()))
-        {
+          (1000 / config_.autorepeat_rate.get_value<int>())) {
           robotone_joy_msg_.header.stamp = this->now();
           robotone_joy_msg_.header.frame_id = config_.dev.as_string().c_str();
           joy_publisher_->publish(robotone_joy_msg_);
