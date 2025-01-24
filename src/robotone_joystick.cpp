@@ -112,6 +112,7 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
         config_.coalesce_interval.value_to_string().c_str());
       if (config_.coalesce_interval.get_value<int>() < 0) {
         this->set_parameters({rclcpp::Parameter("coalesce_interval", 0)});
+        this->get_parameter("coalesce_interval", config_.coalesce_interval);
       }
     } else {
       RCLCPP_ERROR_EXPRESSION(
@@ -141,16 +142,17 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
         config_.autorepeat_rate.value_to_string().c_str());
       if (config_.autorepeat_rate.get_value<int>() < 0) {
         this->set_parameters({rclcpp::Parameter("autorepeat_rate", 0)});
+        this->get_parameter("autorepeat_rate", config_.autorepeat_rate);
+      }
+      if (config_.autorepeat_rate.get_value<int>() > 1000) {
+        this->set_parameters({rclcpp::Parameter("autorepeat_rate", 1000)});
+        this->get_parameter("autorepeat_rate", config_.autorepeat_rate);
       }
     } else {
       RCLCPP_ERROR_EXPRESSION(
         this->get_logger(),
         config_.autorepeat_rate.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET,
         "Parameter 'autorepeat_rate' is not set");
-    }
-
-    if (config_.autorepeat_rate.get_value<int>() < 0) {
-      this->set_parameters({rclcpp::Parameter("autorepeat_rate", 1000)});
     }
   } else {
     RCLCPP_ERROR(this->get_logger(), "Failed to get parameter 'autorepeat_rate");
@@ -168,6 +170,7 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
         config_.deadzone.value_to_string().c_str());
       if (config_.deadzone.get_value<double>() < 0) {
         this->set_parameters({rclcpp::Parameter("deadzone", 0)});
+        this->get_parameter("deadzone", config_.deadzone);
       } else {
         RCLCPP_ERROR_EXPRESSION(
           this->get_logger(),
@@ -182,9 +185,6 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
     scale_ = static_cast<float>(-1.0 / (1.0 - config_.deadzone.get_value<double>()) / 32767.0);
 
     // Initializes a timer to periodically call the JoystickUpdate() method.
-    // NOTE: This line may can be deleted
-    int coalesce_interval = config_.coalesce_interval.get_value<int>();
-
     update_timer_ = create_wall_timer(
       std::chrono::milliseconds(config_.coalesce_interval.get_value<int>()),
       std::bind(&RobotoneJoystick::JoystickUpdate, this));
