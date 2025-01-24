@@ -17,9 +17,9 @@
  * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick.hpp
- * @version 0.0.13
- * @date 2025-01-23
- * @note Update number of buttons and axis for joy_msg
+ * @version 0.0.14
+ * @date 2025-01-24
+ * @note Update joystick signal scale and update get paramareters value procedures
  * @brief This C++ header file defines a ROS2 node called RobotoneJoystick to
  * handle joystick inputs for the Robotone project. The node manages joystick
  * connections, reads input data (buttons and axes), and publishes the data as
@@ -79,9 +79,9 @@ public:
    */
   struct AxisConfig
   {
-    short min;    ///< Minimum value of the axis.
-    short max;    ///< Maximum value of the axis.
-    short value;  ///< Current value of the axis.
+    double min;    ///< Minimum value of the axis.
+    double max;    ///< Maximum value of the axis.
+    double value;  ///< Current value of the axis.
   };
 
   /**
@@ -229,6 +229,10 @@ private:
   rclcpp::TimerBase::SharedPtr update_timer_;  ///< Timer for periodic updates.
   Joystick joystick_;                          ///< Joystick object to manage joystick state.
   Config config_;                              ///< Configuration object to store parameters.
+
+  double deadzone_;
+  double deadzone_scale_;
+  double scale_;
 };
 }  // end namespace teleop
 

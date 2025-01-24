@@ -2,7 +2,7 @@ robotone_joystick_node:
   ros__parameters:
     topic_name: /robotone_joystick
     dev: /dev/input/js0
-    debug: false
-    autorepeat_rate: 10 #Hz
+    debug: true
+    autorepeat_rate: 0 #Hz
     coalesce_interval: 1 #ms
     deadzone: 0.05

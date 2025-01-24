@@ -17,9 +17,9 @@
  * along with [Project Name].  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick_node.cpp
- * @version 0.0.13
- * @date 2025-01-23
- * @note Update number of buttons and axis for joy_msg
+ * @version 0.0.14
+ * @date 2025-01-24
+ * @note Update joystick signal scale and update get paramareters value procedures
  * @brief
  *
  */

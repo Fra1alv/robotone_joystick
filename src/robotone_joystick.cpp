@@ -17,9 +17,9 @@
  * along with RobotOne.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @file robotone_joystick.cpp
- * @version 0.0.13
- * @date 2025-01-23
- * @note Update number of buttons and axis for joy_msg
+ * @version 0.0.14
+ * @date 2025-01-24
+ * @note Update joystick signal scale and update get paramareters value procedures
  * @brief This C++ file implements a ROS2 node RobotoneJoystick to handle
  * joystick inputs for the Robotone project. It reads joystick
  * events->button_state and axes), manages device connections, and publishes the
@@ -56,11 +56,22 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
   this->declare_parameter("coalesce_interval", rclcpp::PARAMETER_INTEGER);
   this->declare_parameter("deadzone", rclcpp::PARAMETER_DOUBLE);
 
-  // Get parameters value
-  this->get_parameter("debug", config_.debug);
-  this->get_parameter("autorepeat_rate", config_.autorepeat_rate);
-  this->get_parameter("coalesce_interval", config_.coalesce_interval);
-  this->get_parameter("deadzone", config_.deadzone);
+  //Get parameters value
+  // Get the value of "debug"
+  if (this->get_parameter("debug", config_.debug)) {
+    if (config_.debug.get_type() == rclcpp::ParameterType::PARAMETER_BOOL) {
+      RCLCPP_INFO_EXPRESSION(
+        this->get_logger(), config_.debug.get_value<bool>() == true, "Debug Mode: %s",
+        config_.debug.value_to_string().c_str());
+    } else {
+      RCLCPP_ERROR_EXPRESSION(
+        this->get_logger(),
+        config_.topic_name.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET,
+        "Parameter 'debug' is no set");
+    }
+  } else {
+    RCLCPP_ERROR(this->get_logger(), "Failed to get parameter 'debug'");
+  }
 
   // Get the value of "topic_name"
   if (this->get_parameter("topic_name", config_.topic_name)) {
@@ -68,80 +79,120 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
       RCLCPP_INFO_EXPRESSION(
         this->get_logger(), config_.debug.get_value<bool>() == true, "Topic name is : %s",
         config_.topic_name.as_string().c_str());
-    } else if (config_.topic_name.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET) {
-      RCLCPP_ERROR(this->get_logger(), "Parameter 'topic_name' is not set");
-    } else if (config_.topic_name.get_value<std::string>().empty()) {
-      RCLCPP_ERROR(this->get_logger(), "Parameter topic name is empty");
     }
   } else {
-    RCLCPP_ERROR(this->get_logger(), " Failed to get parameter 'topic_name'");
+    RCLCPP_ERROR(this->get_logger(), "Failed to get parameter 'topic_name'");
   }
 
-  // Get the value of the "dev" parameter
+  // Get the value of the "dev"
   if (this->get_parameter("dev", config_.dev)) {
-    if (config_.dev.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET) {
-      RCLCPP_ERROR(this->get_logger(), "Parameter 'dev' is not set.");
+    if (config_.dev.get_type() == rclcpp::ParameterType::PARAMETER_STRING) {
+      RCLCPP_INFO_EXPRESSION(
+        this->get_logger(), config_.debug.get_value<bool>() == true,
+        "Parameter 'dev' is set to: %s", config_.dev.value_to_string().c_str());
     } else {
-      std::string dev_value = config_.dev.get_value<std::string>();
-      if (dev_value.empty()) {
-        RCLCPP_INFO(this->get_logger(), "Parameter 'dev' is empty.");
-      } else {
-        RCLCPP_INFO(this->get_logger(), "Parameter 'dev' has a value: %s", dev_value.c_str());
-      }
+      RCLCPP_ERROR_EXPRESSION(
+        this->get_logger(), config_.deadzone.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET,
+        "Parameter 'dev' is not set");
     }
   } else {
     RCLCPP_ERROR(this->get_logger(), "Failed to get parameter 'dev'");
   }
 
-  // Get the value of the "coalesce_interval" parameter
-  // NOTE: We might need to use it to reduce the number of messages
-  int coalesce_interval = config_.coalesce_interval.get_value<int>();
-
-  RCLCPP_WARN_EXPRESSION(
-    this->get_logger(), config_.coalesce_interval.get_value<int>() < 0,
-    "%s: coalesce_interval (%s) is less than 0, it is going to be set to 0", name.c_str(),
-    config_.coalesce_interval.value_to_string().c_str());
-
-  if (config_.coalesce_interval.get_value<int>() < 0) {
-    this->set_parameters({rclcpp::Parameter("coalesce_interval", 0.0)});
+  // Get the value of the "coalesce_interval"
+  if (this->get_parameter("coalesce_interval", config_.coalesce_interval)) {
+    if (config_.coalesce_interval.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER) {
+      RCLCPP_INFO_EXPRESSION(
+        this->get_logger(), config_.debug.get_value<bool>() == true,
+        "Parameter 'coalesce_interval' set to: %s",
+        config_.coalesce_interval.value_to_string().c_str());
+      RCLCPP_WARN_EXPRESSION(
+        this->get_logger(), config_.coalesce_interval.get_value<int>() < 0,
+        "Parameter coalesce_interval (%s) is less than 0, it is going to be set to 0",
+        config_.coalesce_interval.value_to_string().c_str());
+      if (config_.coalesce_interval.get_value<int>() < 0) {
+        this->set_parameters({rclcpp::Parameter("coalesce_interval", 0)});
+      }
+    } else {
+      RCLCPP_ERROR_EXPRESSION(
+        this->get_logger(),
+        config_.coalesce_interval.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET,
+        "Parameter 'coalesce_interval' is not set");
+    }
+  } else {
+    RCLCPP_ERROR(this->get_logger(), "Failed to get parameter 'coalesce_interval");
   }
 
-  // we may need to use auto repeat
-  RCLCPP_WARN_EXPRESSION(
-    this->get_logger(), config_.autorepeat_rate.get_value<int>() < 0,
-    "%s: autorepeat_rate (%s) is less than 0, it is going to be set to 0", name.c_str(),
-    config_.autorepeat_rate.value_to_string().c_str());
+  // Get the value of the "autorepeat_rate"
+  if (this->get_parameter("autorepeat_rate", config_.autorepeat_rate)) {
+    if (config_.autorepeat_rate.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER) {
+      RCLCPP_INFO_EXPRESSION(
+        this->get_logger(), config_.debug.get_value<bool>() == true,
+        "Parameter 'autorepeat_rate' set to: %s",
+        config_.autorepeat_rate.value_to_string().c_str());
+      RCLCPP_WARN_EXPRESSION(
+        this->get_logger(), config_.autorepeat_rate.get_value<int>() < 0,
+        "Parameter autorepeat_rate (%s) is less than 0, it is going to be set to 0",
+        config_.autorepeat_rate.value_to_string().c_str());
+      RCLCPP_WARN_EXPRESSION(
+        this->get_logger(), config_.autorepeat_rate.get_value<int>() > 1000,
+        "Parameter autorepeat_rate (%s) is greater than 1000, it is going to be set to "
+        "1000",
+        config_.autorepeat_rate.value_to_string().c_str());
+      if (config_.autorepeat_rate.get_value<int>() < 0) {
+        this->set_parameters({rclcpp::Parameter("autorepeat_rate", 0)});
+      }
+    } else {
+      RCLCPP_ERROR_EXPRESSION(
+        this->get_logger(),
+        config_.autorepeat_rate.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET,
+        "Parameter 'autorepeat_rate' is not set");
+    }
 
-  RCLCPP_WARN_EXPRESSION(
-    this->get_logger(), config_.autorepeat_rate.get_value<int>() > 1000,
-    "%s: autorepeat_rate (%s) is greater than 1000, it is going to be set to "
-    "1000",
-    name.c_str(), config_.autorepeat_rate.value_to_string().c_str());
-
-  if (config_.autorepeat_rate.get_value<int>() < 0) {
-    this->set_parameters({rclcpp::Parameter("autorepeat_rate", 0)});
+    if (config_.autorepeat_rate.get_value<int>() < 0) {
+      this->set_parameters({rclcpp::Parameter("autorepeat_rate", 1000)});
+    }
+  } else {
+    RCLCPP_ERROR(this->get_logger(), "Failed to get parameter 'autorepeat_rate");
   }
 
-  if (config_.autorepeat_rate.get_value<int>() < 0) {
-    this->set_parameters({rclcpp::Parameter("autorepeat_rate", 1000)});
+  // Get the value of the "deadzone"
+  if (this->get_parameter("deadzone", config_.deadzone)) {
+    if (config_.deadzone.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE) {
+      RCLCPP_INFO_EXPRESSION(
+        this->get_logger(), config_.debug.get_value<bool>() == true,
+        "Parameter 'deadzone' value is: %s", config_.deadzone.value_to_string().c_str());
+      RCLCPP_WARN_EXPRESSION(
+        this->get_logger(), config_.deadzone.get_value<double>() < 0,
+        "Parameter deadzone (%s) is less than 0, it is going to be set to 0",
+        config_.deadzone.value_to_string().c_str());
+      if (config_.deadzone.get_value<double>() < 0) {
+        this->set_parameters({rclcpp::Parameter("deadzone", 0)});
+      } else {
+        RCLCPP_ERROR_EXPRESSION(
+          this->get_logger(),
+          config_.deadzone.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET,
+          "Parameter 'deadzone' is not set");
+      }
+    } else {
+      RCLCPP_ERROR(this->get_logger(), "Failed to get parameter 'deadzone'");
+    }
+
+    deadzone_scale_ = (config_.deadzone.get_value<double>() * 32767.0);
+    scale_ = static_cast<float>(-1.0 / (1.0 - config_.deadzone.get_value<double>()) / 32767.0);
+
+    // Initializes a timer to periodically call the JoystickUpdate() method.
+    // NOTE: This line may can be deleted
+    int coalesce_interval = config_.coalesce_interval.get_value<int>();
+
+    update_timer_ = create_wall_timer(
+      std::chrono::milliseconds(config_.coalesce_interval.get_value<int>()),
+      std::bind(&RobotoneJoystick::JoystickUpdate, this));
+
+    // Setup the joystick publisher
+    joy_publisher_ =
+      this->create_publisher<sensor_msgs::msg::Joy>(config_.topic_name.as_string(), 10);
   }
-
-  RCLCPP_INFO(
-    this->get_logger(), "Parameter autorepeat_rate has a value: %s",
-    config_.autorepeat_rate.value_to_string().c_str());
-
-  RCLCPP_INFO_EXPRESSION(
-    this->get_logger(), config_.debug.get_value<bool>() == true, "Debug Mode: %s",
-    config_.debug.value_to_string().c_str());
-
-  // Initializes a timer to periodically call the JoystickUpdate() method.
-  update_timer_ = create_wall_timer(
-    std::chrono::milliseconds(coalesce_interval),
-    std::bind(&RobotoneJoystick::JoystickUpdate, this));
-
-  // Setup the joystick publisher
-  joy_publisher_ =
-    this->create_publisher<sensor_msgs::msg::Joy>(config_.topic_name.as_string(), 10);
 }
 /**
  * @brief Destroy the Robotone Joystick:: Robotone Joystick object
@@ -153,7 +204,7 @@ RobotoneJoystick::~RobotoneJoystick()
   if (joystick_.is_connected) {
     CloseJoystick(joystick_);
   }
-}
+};
 
 /**
  * @brief Opens the joystick device and initializes its properties.
@@ -214,7 +265,6 @@ void RobotoneJoystick::OpenJoystick(Joystick & joystick, const std::string & joy
       return;
     }
 
-    //NOTE: Update number of buttons and axis
     robotone_joy_msg_.axes.resize(joystick_.num_axes);
     robotone_joy_msg_.buttons.resize(joystick_.num_buttons);
 
@@ -253,14 +303,6 @@ void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
   joystick->has_axis_event = false;
   joystick->has_buttons_event = false;
 
-  // Min and Max
-  double min_value = -32767.0;
-  double max_value = 32767.0;
-
-  // Calculate deadzone threshold
-  double deadzone = config->deadzone.get_value<double>();
-  double deadzone_threshold = deadzone * max_value;
-
   // Check for errors
   if (bytes == -1 && errno != EAGAIN) {
     RCLCPP_ERROR(this->get_logger(), "Error reading joystick input: %s", std::strerror(errno));
@@ -284,22 +326,21 @@ void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
         }
       } else if (joystick->event.type & JS_EVENT_AXIS) {
         // Apply deadzone to axis values
-        short axis_value = joystick->event.value;
-        if (std::abs(joystick->event.value) < deadzone_threshold) {
-          axis_value = 0.0;
+        double axis_value = static_cast<double>(joystick->event.value);
+        if (axis_value > deadzone_scale_) {
+          axis_value -= deadzone_scale_;
+        } else if (axis_value < -deadzone_scale_) {
+          axis_value += deadzone_scale_;
         } else {
-          // Normalize the axis value
-          double normalized_value = 2 * (axis_value - min_value) / (max_value - min_value) - 1;
-          double scaled_value = normalized_value;
-          axis_value = scaled_value;
+          axis_value = 0.0;
         }
-        joystick->axes[joystick->event.number].value = axis_value;
+        joystick->axes[joystick->event.number].value = static_cast<float>(axis_value * scale_);
         joystick->has_axis_event = true;
         // Debug
         if (config->debug.get_value<bool>()) {
           RCLCPP_INFO(
-            this->get_logger(), "Axis %u at position %d", joystick->event.number,
-            joystick->event.value);
+            this->get_logger(), "Axis %u at position %f", joystick->event.number,
+            joystick->axes[joystick->event.number].value);
         }
       }
     }
@@ -310,7 +351,7 @@ void RobotoneJoystick::ReadJoystickInput(Joystick * joystick, Config * config)
  * @brief Continuously monitors joystick events using inotify and processes
  * them.
  *
- * @note Update number of buttons and axis for joy_msg
+ * @note Update joystick signal scale and update get paramareters value procedures
  * it should handle any necessary processing or resource management related to
  * the joystick events.
  */
