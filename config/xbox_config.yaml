@@ -3,6 +3,6 @@ robotone_joystick_node:
     topic_name: /robotone_joystick
     dev: /dev/input/js0
     debug: true
-    autorepeat_rate: 0 #Hz
+    autorepeat_rate: 10 #Hz
     coalesce_interval: 1 #ms
     deadzone: 0.05
