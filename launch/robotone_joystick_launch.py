@@ -1,27 +1,34 @@
-import os
-from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, TextSubstitution
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
     # Declare launch arguments
-    joy_config = LaunchConfiguration('joy_config')
-    config_filepath = LaunchConfiguration('config_filepath')
+    config_filepath = PathJoinSubstitution([
+        FindPackageShare("robotone_joystick"),
+        "config",
+        "xbox_config.yaml"
+    ])
+
     logger = LaunchConfiguration('log_level')
 
     # Declare launch arguments for flexibility
     ld = LaunchDescription([
-        DeclareLaunchArgument('joy_config', default_value='xbox',
-                              description='Joystick configuration (e.g., xbox, ps4)'),
-        DeclareLaunchArgument('config_filepath', default_value=[TextSubstitution(text=os.path.join(
-            get_package_share_directory('robotone_joystick'), 'config', '')), joy_config,
-            TextSubstitution(text='_config.yaml')],
-            description='Path to the joystick configuration file'),
-        DeclareLaunchArgument('log_level', default_value='info',
-                              description='Logging level (info or debug)')])
+        DeclareLaunchArgument(
+            name='config_filepath', 
+            default_value=config_filepath,
+            description='Path to the joystick configuration file'
+        ),
+
+        DeclareLaunchArgument(
+            name='log_level', 
+            default_value='info',
+            description='Logging level (info or debug)'
+        )
+    ])
 
     # Define the joystick node with remappings and parameters
     joy_node = Node(
