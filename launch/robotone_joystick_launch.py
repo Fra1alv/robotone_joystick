@@ -8,9 +8,9 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     # Declare launch arguments
     config_filepath = PathJoinSubstitution([
-        FindPackageShare("robotone_joystick"),
-        "config",
-        "xbox_config.yaml"
+        FindPackageShare('robotone_joystick'),
+        'config',
+        'xbox_config.yaml'
     ])
 
     logger = LaunchConfiguration('log_level')
@@ -18,13 +18,13 @@ def generate_launch_description():
     # Declare launch arguments for flexibility
     ld = LaunchDescription([
         DeclareLaunchArgument(
-            name='config_filepath', 
+            name='config_filepath',
             default_value=config_filepath,
             description='Path to the joystick configuration file'
         ),
 
         DeclareLaunchArgument(
-            name='log_level', 
+            name='log_level',
             default_value='info',
             description='Logging level (info or debug)'
         )
