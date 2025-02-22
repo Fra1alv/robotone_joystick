@@ -7,7 +7,7 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     # Declare launch arguments
-    config_filepath = PathJoinSubstitution([
+    config_file_path = PathJoinSubstitution([
         FindPackageShare('robotone_joystick'),
         'config',
         'xbox_config.yaml'
@@ -38,7 +38,7 @@ def generate_launch_description():
         output='screen',
         arguments=['--ros-args', '--log-level', logger],
         remappings=[('/joy', '/robotone_joy')],
-        parameters=[config_filepath]
+        parameters=[config_file_path]
     )
 
     # Add the node to the launch description
