@@ -145,7 +145,7 @@ public:
 
 protected:
   // TODO: Needs to be implemented
-  // NOTE: The idea is to use this for proximity alert. Using some sort of the sensor that
+  // NOTE: The idea is to use this as a proximity alert. Using some sort of the sensor that
   // detect if there some object/barrier too close to the robot buddy. It needs to be done after
   // finishing the implementation of robotone_teleop
   /**
