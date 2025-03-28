@@ -19,7 +19,7 @@
  * @file robotone_joystick_node.cpp
  * @version 0.0.14
  * @date 2025-01-24
- * @brief
+ * @brief Joystick node for RobotOne project
  *
  */
 #include <rclcpp/rclcpp.hpp>

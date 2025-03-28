@@ -22,7 +22,7 @@
  * @note Update joystick signal scale and update get paramareters value procedures
  * @brief This file implements a node RobotoneJoystick to handle
  * joystick inputs for the Robotone project. It reads joystick
- * events->button_state and axes), manages device connections, and publishes the
+ * events->button_state and axes, manages device connections, and publishes the
  * data using ROS2 messages. Additionally, it handles feedback from the system
  * to c control joystick haptic responses.
  *
@@ -56,8 +56,8 @@ RobotoneJoystick::RobotoneJoystick(const std::string & name)
   this->declare_parameter("coalesce_interval", rclcpp::PARAMETER_INTEGER);
   this->declare_parameter("deadzone", rclcpp::PARAMETER_DOUBLE);
 
-  //Get parameters value
-  // Get the value of "debug"
+  // Get parameters value
+  //  Get the value of "debug"
   if (this->get_parameter("debug", config_.debug)) {
     if (config_.debug.get_type() == rclcpp::ParameterType::PARAMETER_BOOL) {
       RCLCPP_INFO_EXPRESSION(
@@ -443,8 +443,7 @@ void RobotoneJoystick::JoystickUpdate()
         rclcpp::Duration duration_ = now - last_pub;
         if (
           RCL_NS_TO_MS(duration_.nanoseconds()) >=
-          (1000 / config_.autorepeat_rate.get_value<int>()))
-        {
+          (1000 / config_.autorepeat_rate.get_value<int>())) {
           robotone_joy_msg_.header.stamp = this->now();
           robotone_joy_msg_.header.frame_id = config_.dev.as_string().c_str();
           joy_publisher_->publish(robotone_joy_msg_);
