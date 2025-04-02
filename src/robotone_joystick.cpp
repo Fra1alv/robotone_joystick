@@ -20,7 +20,7 @@
  * @version 0.0.14
  * @date 2025-01-24
  * @note Update joystick signal scale and update get paramareters value procedures
- * @brief This file implements a node RobotoneJoystick to handle
+ * @brief This file implements a node robotone_joystick_node to handle
  * joystick inputs for the Robotone project. It reads joystick
  * events->button_state and axes, manages device connections, and publishes the
  * data using ROS2 messages. Additionally, it handles feedback from the system
