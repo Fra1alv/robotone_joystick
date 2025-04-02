@@ -204,6 +204,7 @@ RobotoneJoystick::~RobotoneJoystick()
   if (joystick_.is_connected) {
     CloseJoystick(joystick_);
   }
+  RCLCPP_INFO(this->get_logger(), "Node %s shutdown", this->get_name());
 }
 
 /**
