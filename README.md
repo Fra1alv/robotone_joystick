@@ -110,5 +110,5 @@ This project is licensed under the [GPLv3 License](/LICENSE).
 
 ## Contact
 For support or questions, feel free to reach out:
-- Email: alonsofra1alv@gmail.com.com
+- Email: alonsofra1alv@gmail.com
 - GitHub: [Fra1alv](https://github.com/fra1alv)
