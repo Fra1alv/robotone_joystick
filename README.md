@@ -65,7 +65,7 @@ robotone_joystick_node:
 
 1. Launch the joystick node:
    ```bash
-   ros2 launch robotone_joystick joystick_control_launch.py
+   ros2 launch robotone_joystick robotone_joystick_launch.py 
    ```
    Note: xBox controller is default in future we might have different controllers.
 2. Verify the node list
