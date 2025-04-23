@@ -13,7 +13,7 @@
 
 
 ## Overview
-The `robotone_joystick` package provides joystick control for the RobotOne system. It enables users to interact with the RobotOne platform using an Xbox controller for operation and testing. This package runs only on Linux system.
+The `robotone_joystick` is a ROS2 package that provides Joystick state. It enables users to interact with the robot using an Xbox controller for operation and testing. This package runs only on Linux system.
 
 Key features include:
 - Crete Joystick node
