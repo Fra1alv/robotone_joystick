@@ -96,8 +96,8 @@ robotone_joystick/
 │   └── robotone_joystick_node.hpp
 │       └── robotone_joystick,cpp           
 ├── CMakeLists.txt  
-├── package.xml                         # Project documentation
-└── README.md                           # ROS2 package manifest
+├── package.xml                         # ROS2 package manifest
+└── README.md                           
 ```
 ## Contributing
 Contributions are welcome! Please follow these steps:
