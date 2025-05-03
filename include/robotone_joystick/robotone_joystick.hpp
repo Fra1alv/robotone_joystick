@@ -145,8 +145,7 @@ public:
 
 protected:
   // TODO: Needs to be implemented
-  // NOTE: The idea is to use this as a proximity alert. Using some sort of the sensor that
-  // detect if there some object/barrier too close to the robot.
+  // NOTE: The idea is to use this as a proximity alert.
   /**
    *
    * @brief Set the Feedback object
